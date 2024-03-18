@@ -1,0 +1,88 @@
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+#chat {
+    width: 80%;
+    height: 60vh;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 50px;
+    overflow-y: auto;
+}
+
+#chat p {
+    background-color: green;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-weight: bolder;
+}
+
+#messageForm {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    flex-direction: column; /* Cambia la dirección del flexbox a columna */
+}
+
+#messageForm input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#messageForm button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: #fff;
+    cursor: pointer;
+    height: 40px; /* Asegura que el botón tenga el mismo tamaño que el cuadro de entrada */
+    width: 100%; /* Hace que el botón tenga el mismo ancho que el campo de entrada */
+}
+
+.cerrar-sesion {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px 20px;
+    background-color: red;
+    color: white;
+    text-decoration: none;
+}
+.cerrar-sesion:hover {
+    background-color: darkred;
+}
+
+#deleteAccount {
+    display: block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ff0000;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+#deleteAccount:hover {
+    background-color: #cc0000;
+}

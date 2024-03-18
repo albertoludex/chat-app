@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register_styles.css') }}">
+
+    <title>Crear cuenta</title>
+</head>
+
+<body>
+    <h1>Crear cuenta</h1>
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+    {% if success %}
+    <p class="success">{{ success }}</p>
+    {% endif %}
+    <form action="{{ url_for('crear_cuenta') }}" method="post">
+        <input type="email" name="email" placeholder="Correo electrónico" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Crear cuenta</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="home-button">Ir a inicio</a>
+
+</body>
+
+</html>
