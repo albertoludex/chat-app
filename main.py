@@ -4,6 +4,10 @@
 #git commit -m "mensaje cambios"
 #git push 
 
+#para clonar el repositorio primero ve a ruta donde quieres clonarlo
+#segundo git clone (url del repositorio)
+#tercero cd (nombre del repositorio)
+
 # Importamos las librerías necesarias
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import join_room, emit
