@@ -1,4 +1,8 @@
 #para ver los usuarios que tenemos creados tenemos que entrar: http://localhost:5000/ver_usuarios
+#git status
+#git add .
+#git commit -m "mensaje cambios"
+#git push 
 
 # Importamos las librerías necesarias
 from flask import Flask, render_template, request, redirect, url_for, session, flash
