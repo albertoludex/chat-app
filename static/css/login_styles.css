@@ -64,3 +64,14 @@ form button {
 .home-button:hover {
     background-color: #007B9A;
 }
+.forgot-password-button {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007BFF;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-password-button:hover {
+    color: #0056b3;
+}

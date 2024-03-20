@@ -13,13 +13,27 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_socketio import join_room, emit
 from flask_socketio import SocketIO, send
 from sqlite3 import IntegrityError
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 import sqlite3
 import os
 import random
 
-# Creamos una nueva aplicación Flask y configuramos la clave secreta
+import itsdangerous
 app = Flask(__name__)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+# Creamos una nueva aplicación Flask y configuramos la clave secreta
 app.config['SECRET_KEY'] = os.urandom(24)
+
+mail = Mail(app)
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
 socketio = SocketIO(app)
 
 # Función para crear una conexión con la base de datos
@@ -35,7 +49,54 @@ def create_table():
     conn.commit()
     conn.close()
 
+#Aqui empieza el codigo para la recuperacion de contraseña
+@app.route('/solicitar_recuperacion', methods=['GET', 'POST'])
+def solicitar_recuperacion():
+    if request.method == 'POST':
+        email = request.form['email']
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+        conn.close()
 
+        if user:
+            token = s.dumps(email, salt='recover-key')
+            msg = Message('Recuperar contraseña', sender='friunitsoporte@gmail.com', recipients=[email])
+            link = url_for('recuperar_contrasena', token=token, _external=True)#aqui se esta generando la URL
+            msg.body = 'Haz click en el siguiente enlace para restablecer tu contraseña: {}'.format(link)
+            try:
+                mail.send(msg)
+                print("Correo enviado exitosamente")
+            except Exception as e:
+                print("Hubo un error al enviar el correo: ", e)
+            return render_template('solicitar_recuperacion.html', success='Te hemos enviado un correo electrónico con instrucciones para restablecer tu contraseña, EL CODIGO EXPIRA EN 10 MINUTOS')
+        else:
+            return render_template('solicitar_recuperacion.html', error='Correo no encontrado en la base de datos')
+
+    return render_template('solicitar_recuperacion.html')
+@app.route('/recuperar_contrasena/<token>', methods=['GET', 'POST'])
+def recuperar_contrasena(token):
+    error = None
+    try:
+        email = s.loads(token, salt='recover-key', max_age=60)
+    except itsdangerous.SignatureExpired:
+        return "El enlace ha expirado", 400
+    except itsdangerous.BadTimeSignature:
+        return "El enlace ha expirado, vuelva a solicitarlo", 400
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+        if password != confirm_password:
+            error = 'Las contraseñas no coinciden'
+        elif user['password'] == password:
+            error = 'La nueva contraseña no puede ser la misma que la anterior'
+        else:
+            conn.execute('UPDATE users SET password = ? WHERE email = ?', (password, email))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('iniciar_sesion'))
+    return render_template('recuperar_contrasena.html', error=error, token=token)
 # Llamamos a la función para crear la tabla
 create_table()
 
@@ -165,3 +226,4 @@ def handle_connect():
 if __name__ == '__main__':
     create_table()
     socketio.run(app, debug=True)
+

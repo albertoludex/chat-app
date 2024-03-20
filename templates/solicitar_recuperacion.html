@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Solicitar recuperación de contraseña</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/solicitar_recuperacion.css') }}">
+
+</head>
+<body>
+    <h1>Solicitar recuperación de contraseña</h1>
+    <form method="POST">
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" name="email" required>
+        <input type="submit" value="Solicitar recuperación">
+    </form>
+    <a href="{{ url_for('index') }}" class="home-button">Ir a inicio</a>
+
+    {% if success %}
+        <p>{{ success }}</p>
+    {% endif %}
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+</body>
+</html>

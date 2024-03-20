@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recuperar Contraseña</title>
+    <!-- Asegúrate de incluir tus propios estilos CSS aquí -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recuperar_contrasena.css') }}">
+</head>
+<body>
+    <h1>Recuperar Contraseña</h1>
+    <!-- Aquí es donde agregamos el código para mostrar el mensaje de error -->
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+    <form action="{{ url_for('recuperar_contrasena', token=token) }}" method="post">
+        <input type="password" name="password" placeholder="Nueva Contraseña" required>
+        <input type="password" name="confirm_password" placeholder="Confirmar Contraseña" required>
+        <button type="submit">Cambiar Contraseña</button>
+    </form>
+    <a href="{{ url_for('iniciar_sesion') }}">Volver a Iniciar Sesión</a>
+</body>
+</html>
