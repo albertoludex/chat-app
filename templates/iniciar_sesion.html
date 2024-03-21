@@ -4,10 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login_styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global_styles.css') }}">
+
 
     <title>Iniciar sesión</title>
 </head>
 <body>
+    <div class="dropdown">
+        <button class="dropbtn">Menú</button>
+        <div class="dropdown-content">
+            <!-- Añade más opciones aquí -->
+
+        </div>
+    </div>
     <h1>Iniciar sesión</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
