@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cambiar contraseña</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cambiar_contrasena.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global_styles.css') }}">
+
+ 
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <!-- Aquí puedes agregar tu menú de navegación -->
+    </nav>
+    <div class="container">
+        <h2>Cambiar contraseña</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="contrasena_actual">Contraseña actual:</label>
+                <input type="password" class="form-control" id="contrasena_actual" name="old_password" required>
+            </div>
+            <div class="form-group">
+                <label for="nueva_contrasena">Nueva contraseña:</label>
+                <input type="password" class="form-control" id="nueva_contrasena" name="new_password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmar_contrasena">Confirmar nueva contraseña:</label>
+                <input type="password" class="form-control" id="confirmar_contrasena" name="confirm_password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+            alert("{{ messages[0][1] }}");
+            </script>
+        {% endif %}
+    {% endwith %}
+        <a href="{{ url_for('index') }}" class="home-button">Ir a inicio</a>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html>

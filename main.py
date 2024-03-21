@@ -246,12 +246,47 @@ def usuarios_activos():
 
 #ruta para cambio de contraseña
 
+@app.route('/modificar_contrasena', methods=['GET', 'POST'])
+def modificar_contrasena():
+    print(f'Método de la solicitud: {request.method}')  # Nueva declaración de impresión
 
+    if 'user' not in session:
+        flash('Debes iniciar sesión para cambiar tu contraseña', 'error')
+        return redirect(url_for('iniciar_sesion'))
 
+    error = None
+    if request.method == 'POST':
+        print('Solicitud POST recibida')  # Nueva declaración de impresión
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user'],)).fetchone()
+
+        if user['password'] != old_password:
+            error = 'La contraseña antigua es incorrecta'
+            print('La contraseña antigua es incorrecta')  # Nueva declaración de impresión
+        elif new_password != confirm_password:
+            error = 'Las contraseñas no coinciden'
+            print('Las contraseñas no coinciden')  # Nueva declaración de impresión
+        else:
+            result = conn.execute('UPDATE users SET password = ? WHERE id = ?', (new_password, session['user']))
+            conn.commit()
+            print(f'Resultado de la consulta SQL: {result.rowcount} filas afectadas')  # Imprime el resultado de la consulta SQL
+            conn.close()
+        
+
+        return redirect(url_for('exito'))
+    return render_template('modificar_contrasena.html', error=error)
+@app.route('/exito')
+def exito():
+    return render_template('exito.html')
 # Iniciamos la aplicación
 if __name__ == '__main__':
     create_table()
     socketio.run(app, debug=True)
+    
 
 
 
