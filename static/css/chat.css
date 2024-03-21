@@ -1,88 +1,140 @@
 body {
-    background-color: #f0f0f0;
     font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100vh;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
 }
 
-h1 {
-    color: #333;
-}
-
-#chat {
+#main-container {
+    display: flex;
+    flex-direction: row;
     width: 80%;
-    height: 60vh;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 50px;
+    height: 80vh;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#active-users {
+    width: 30%;
+    border-right: 1px solid #ccc;
+    padding: 20px;
     overflow-y: auto;
 }
 
-#chat p {
-    background-color: green;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 10px 0;
-    font-weight: bolder;
+#active-users h2 {
+    margin: 0 0 20px;
+}
+
+#active-users ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#active-users ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+#chat-container {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+#chat {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
 }
 
 #messageForm {
     display: flex;
-    justify-content: center;
-    gap: 10px;
-    width: 80%;
-    flex-direction: column; /* Cambia la dirección del flexbox a columna */
+    justify-content: space-between;
 }
 
 #messageForm input {
-    flex-grow: 1;
+    width: 85%;
     padding: 10px;
-    border-radius: 5px;
     border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 #messageForm button {
-    padding: 10px 20px;
+    width: 10%;
+    padding: 10px;
     border: none;
-    border-radius: 5px;
-    background-color: #007BFF;
-    color: #fff;
+    background-color: #007bff;
+    color: white;
     cursor: pointer;
-    height: 40px; /* Asegura que el botón tenga el mismo tamaño que el cuadro de entrada */
-    width: 100%; /* Hace que el botón tenga el mismo ancho que el campo de entrada */
+}
+
+#deleteAccount {
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    background-color: #dc3545;
+    color: white;
+    cursor: pointer;
 }
 
 .cerrar-sesion {
     position: absolute;
-    top: 0;
-    right: 0;
-    padding: 10px 20px;
-    background-color: red;
-    color: white;
+    top: 10px;
+    right: 10px;
+    color: #007bff;
     text-decoration: none;
 }
-.cerrar-sesion:hover {
-    background-color: darkred;
+.connected-message {
+    color: white; /* Cambia el color del texto a blanco */
+    background-color: #008000;
+    padding: 10px; /* Añade un poco de espacio alrededor del texto */
+    border-radius: 10px; /* Redondea las esquinas del mensaje */
+    font-weight: bold; /* Hace que el texto sea en negrita */
+}
+.message {
+    padding: 15px 20px;
+    margin: 10px 0;
+    border-radius: 20px;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    max-width: 80%;
+    align-self: flex-end;
+    position: relative;
+    word-wrap: break-word;
 }
 
-#deleteAccount {
-    display: block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #ff0000;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
+.message:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -10px;
+    width: 0;
+    height: 0;
+    border: 15px solid;
+    border-color: #007bff transparent transparent transparent;
 }
 
-#deleteAccount:hover {
-    background-color: #cc0000;
+.message:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -20px;
+    width: 0;
+    height: 0;
+    border: 15px solid;
+    border-color: #f5f5f5 transparent transparent transparent;
+}
+.disconnected-message {
+    color: white; /* Cambia el color del texto a blanco */
+    background-color: red;
+    padding: 10px; /* Añade un poco de espacio alrededor del texto */
+    border-radius: 10px; /* Redondea las esquinas del mensaje */
+    font-weight: bold; /* Hace que el texto sea en negrita */
 }

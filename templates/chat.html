@@ -4,52 +4,97 @@
     <title>Chat</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global_styles.css') }}" >
+
+    <!--llamada al js-->
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('users', function(users) {
+            // Obtiene la lista de usuarios
+            var userList = document.getElementById('user-list');
+
+            // Limpia la lista de usuarios
+            while (userList.firstChild) {
+                userList.removeChild(userList.firstChild);
+            }
+
+            // Añade cada usuario a la lista
+            for (var i = 0; i < users.length; i++) {
+                var li = document.createElement('li');
+                li.textContent = users[i];
+                userList.appendChild(li);
+            }
+        });
+    </script>
 </head>
 <body>
-    <div id="chat"></div>
-    <form id="messageForm">
-        <input type="text" id="messageInput">
-        <button type="submit">Enviar</button>
-        </form>
-        <button id="deleteAccount">Eliminar cuenta</button>
-        <script>
-            var socket = io.connect('http://' + document.domain + ':' + location.port);
-            socket.on('connect', function() {
-                socket.emit('my event', {data: 'I\'m connected!'});
-            });
-            socket.on('message', function(data) {
-                var chat = document.getElementById('chat');
-                var message = document.createElement('p');
-                message.textContent = data.text;
-                message.style.backgroundColor = data.color;
-                chat.appendChild(message);
-            });
-            document.getElementById('messageForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                var messageInput = document.getElementById('messageInput');
-                socket.emit('message', messageInput.value);
-                messageInput.value = '';
-            });
-        
-            // Manejador para el botón de eliminación de cuenta
-            document.getElementById('deleteAccount').addEventListener('click', function(e) {
-                if (confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
-                    fetch('/eliminar_cuenta', {method: 'POST'})
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Error al eliminar la cuenta');
-                            }
-                            return response.text();
-                        })
-                        .then(() => {
-                            window.location.href = '/iniciar_sesion';
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
+    <div class="dropdown">
+        <button class="dropbtn">Menú</button>
+        <div class="dropdown-content">
+          <a href="{{ url_for('cerrar_sesion') }}">Cerrar sesión</a>
+          <a id="deleteAccount" href="{{ url_for('eliminar_cuenta') }}">Eliminar cuenta</a>
+          
+        </div>
+      </div>
+ 
+    <div id="main-container">
+        <div id="active-users">
+            <h2>Usuarios activos</h2>
+            <ul id="user-list">
+                <!-- Los usuarios activos se añadirán aquí -->
+            </ul>
+        </div>
+        <div id="chat-container">
+            <div id="chat">
+                <!-- Los mensajes del chat se añadirán aquí -->
+            </div>
+            <form id="messageForm">
+                <input type="text" id="messageInput">
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('connect', function() {
+            socket.emit('my event', {data: 'I\'m connected!'});
+        });
+        socket.on('message', function(data) {
+            var chat = document.getElementById('chat');
+            var message = document.createElement('p');
+            message.textContent = data.text;
+            message.className = data.class;
+            message.style.backgroundColor = data.background;
+            chat.appendChild(message);
+        });
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var messageInput = document.getElementById('messageInput');
+            socket.emit('message', messageInput.value);
+            messageInput.value = '';
+        });
+
+// Manejador para el botón de eliminación de cuenta
+document.getElementById('deleteAccount').addEventListener('click', function(e) {
+    e.preventDefault(); // Evita que el enlace se siga inmediatamente
+    if (confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+        fetch('/eliminar_cuenta', {method: 'POST'})
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al eliminar la cuenta');
                 }
+                return response.text();
+            })
+            .then(() => {
+                alert('Tu cuenta ha sido eliminada exitosamente.'); // Añade este alert
+                window.location.href = '/iniciar_sesion';
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-        </script>
-        <a href="{{ url_for('cerrar_sesion') }}" class="cerrar-sesion">Cerrar sesión</a>  
-        </body>
-        </html>
+    }
+});
+    </script>
+</body>
+</html>

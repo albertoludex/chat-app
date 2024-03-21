@@ -15,11 +15,12 @@ from flask_socketio import SocketIO, send
 from sqlite3 import IntegrityError
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
+from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 import os
 import random
-
 import itsdangerous
+active_users = set()
 app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -77,7 +78,7 @@ def solicitar_recuperacion():
 def recuperar_contrasena(token):
     error = None
     try:
-        email = s.loads(token, salt='recover-key', max_age=60)
+        email = s.loads(token, salt='recover-key', max_age=600)
     except itsdangerous.SignatureExpired:
         return "El enlace ha expirado", 400
     except itsdangerous.BadTimeSignature:
@@ -174,12 +175,16 @@ def cerrar_sesion():
     session.pop('color', None)
     return redirect(url_for('index'))
 # Manejador para cuando un usuario se desconecta
+# Manejador para cuando un usuario se desconecta
 @socketio.on('disconnect')
 def handle_disconnect():
-    send({'text': 'Usuario desconectado', 'color': '#FF0000'}, broadcast=True)
-
-
-@app.route('/eliminar_cuenta', methods=['POST'])
+    if 'email' in session:
+        username = session['email'].split('@')[0]
+        active_users.remove(username)
+        send({'text': f'{username} se ha desconectado', 'class': 'disconnected-message', 'color': '#FF0000'}, broadcast=True)
+        # Emitir la lista actualizada de usuarios activos
+        emit('users', list(active_users), broadcast=True)
+@app.route('/eliminar_cuenta', methods=['GET', 'POST'])
 def eliminar_cuenta():
     if 'user' not in session:
         flash('Debes iniciar sesión para eliminar tu cuenta', 'error')
@@ -196,15 +201,18 @@ def eliminar_cuenta():
     flash('Tu cuenta ha sido eliminada', 'success')
     return redirect(url_for('iniciar_sesion'))
 
-# Manejador para los mensajes del chat
+# Manejador para cuando se envía un mensaje
 @socketio.on('message')
-def handle_message(message):
-    print('Mensaje recibido: ' + message)
-    color = session.get('color')
-    if not color:
-        color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
-        session['color'] = color
-    send({'text': message, 'color': color}, broadcast=True)
+@socketio.on('message')
+def handle_message(data):
+    # Obtiene el nombre de usuario del correo electrónico
+    username = session['email'].split('@')[0]
+
+    # Obtiene el color de la sesión
+    color = session['color']
+
+    # Envia el mensaje con el color de fondo de la sesión
+    emit('message', {'text': f'{username}: {data}', 'class': 'message', 'color': color, 'background': color}, broadcast=True)
 
 # Manejador para cuando un usuario se conecta
 @socketio.on('connect')
@@ -217,13 +225,33 @@ def handle_connect():
         # Obtiene el nombre de usuario del correo electrónico
         username = session['email'].split('@')[0]
 
-        # Envia un mensaje con fondo verde al usuario que se acaba de conectar
-        emit('message', {'text': f'{username} conectado', 'color': '#008000', 'background': '#008000'}, room=request.sid)
+        # Genera un color aleatorio y lo almacena en la sesión
+        color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+        session['color'] = color
 
+        # Envia un mensaje con fondo verde al usuario que se acaba de conectar
+        emit('message', {'text': f'{username} conectado', 'class': 'connected-message', 'color': '#008000', 'background': '#008000'}, room=request.sid)
+
+        # Si el usuario no está en la lista de usuarios activos, lo agrega y emite el mensaje azul
+        if username not in active_users:
+            active_users.add(username)
+            emit('users', list(active_users), broadcast=True)
+
+            # Envia un mensaje con fondo azul a todos los demás usuarios
+            emit('message', {'text': f'{username} conectado', 'class': 'connected-message', 'color': '#0000FF', 'background': '#0000FF'}, broadcast=True, include_self=False)
         # Envia un mensaje con fondo azul a todos los demás usuarios
-        emit('message', {'text': f'{username} conectado', 'color': '#0000FF', 'background': '#0000FF'}, broadcast=True, include_self=False)
+@app.route('/usuarios_activos')
+def usuarios_activos():
+    return render_template('chat.html', users=active_users)
+
+#ruta para cambio de contraseña
+
+
+
 # Iniciamos la aplicación
 if __name__ == '__main__':
     create_table()
     socketio.run(app, debug=True)
+
+
 
